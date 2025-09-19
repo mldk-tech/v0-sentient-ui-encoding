@@ -138,21 +138,76 @@ export function BreathingCanvas({ selectedFrequency, onTileSelect, onTileHover }
     const hoveredTileData = tiles.find((t) => t.id === hoveredTile)
     if (!hoveredTileData) return []
 
-    // Find tiles with same frequency
-    const relatedTiles = tiles
-      .filter((t) => t.id !== hoveredTile && t.frequency === hoveredTileData.frequency)
-      .slice(0, 2) // Limit connections
+    const connections: any[] = []
 
-    return relatedTiles.map((tile) => ({
-      startX: hoveredTileData.x + hoveredTileData.width / 2,
-      startY: hoveredTileData.y + hoveredTileData.height / 2,
-      endX: tile.x + tile.width / 2,
-      endY: tile.y + tile.height / 2,
-      linkedContent: {
-        title: `${tile.frequency} Node`,
-        preview: `Connected to ${tile.metadata}`,
-      },
-    }))
+    // Same-frequency harmonic connections (existing logic)
+    const harmonicTiles = tiles
+      .filter((t) => t.id !== hoveredTile && t.frequency === hoveredTileData.frequency)
+      .slice(0, 1) // Reduced to make room for cross-frequency
+
+    harmonicTiles.forEach((tile) => {
+      connections.push({
+        startX: hoveredTileData.x + hoveredTileData.width / 2,
+        startY: hoveredTileData.y + hoveredTileData.height / 2,
+        endX: tile.x + tile.width / 2,
+        endY: tile.y + tile.height / 2,
+        type: "harmonic",
+        linkedContent: {
+          title: `${tile.frequency} Harmonic`,
+          preview: `Resonant frequency: ${tile.metadata}`,
+        },
+      })
+    })
+
+    // Cross-frequency paradoxical connections (new anthropological logic)
+    const getAnthropologicalConnections = (frequency: string) => {
+      const connectionMap: Record<string, string[]> = {
+        CHAOS: ["CREATION", "SOUL"], // Chaos births creation, chaos reveals soul
+        CREATION: ["CODE", "CHAOS"], // Creation requires code, creation emerges from chaos
+        CODE: ["SOUL", "CREATION"], // Code embodies soul, code enables creation
+        SOUL: ["CHAOS", "CODE"], // Soul confronts chaos, soul transcends code
+      }
+      return connectionMap[frequency] || []
+    }
+
+    const paradoxicalFrequencies = getAnthropologicalConnections(hoveredTileData.frequency)
+    const paradoxicalTiles = tiles
+      .filter((t) => t.id !== hoveredTile && paradoxicalFrequencies.includes(t.frequency))
+      .slice(0, 1) // One rare cross-frequency connection
+
+    paradoxicalTiles.forEach((tile) => {
+      const connectionReason = getConnectionReason(hoveredTileData.frequency, tile.frequency)
+      connections.push({
+        startX: hoveredTileData.x + hoveredTileData.width / 2,
+        startY: hoveredTileData.y + hoveredTileData.height / 2,
+        endX: tile.x + tile.width / 2,
+        endY: tile.y + tile.height / 2,
+        type: "paradoxical",
+        linkedContent: {
+          title: `${hoveredTileData.frequency} ↔ ${tile.frequency}`,
+          preview: connectionReason,
+        },
+      })
+    })
+
+    return connections
+  }
+
+  const getConnectionReason = (freq1: string, freq2: string): string => {
+    const reasons: Record<string, string> = {
+      "CHAOS-CREATION": "מהכאוס נולדת היצירה - From chaos, creation is born",
+      "CHAOS-SOUL": "הכאוס חושף את הנשמה - Chaos reveals the soul",
+      "CREATION-CODE": "היצירה דורשת קוד - Creation requires code",
+      "CREATION-CHAOS": "היצירה צומחת מהכאוס - Creation emerges from chaos",
+      "CODE-SOUL": "הקוד מגלם נשמה - Code embodies soul",
+      "CODE-CREATION": "הקוד מאפשר יצירה - Code enables creation",
+      "SOUL-CHAOS": "הנשמה מתעמתת עם הכאוס - Soul confronts chaos",
+      "SOUL-CODE": "הנשמה מתעלה על הקוד - Soul transcends code",
+    }
+
+    const key1 = `${freq1}-${freq2}`
+    const key2 = `${freq2}-${freq1}`
+    return reasons[key1] || reasons[key2] || "Hidden connection detected"
   }
 
   const gridContent = (
@@ -185,6 +240,7 @@ export function BreathingCanvas({ selectedFrequency, onTileSelect, onTileHover }
           endY={connection.endY}
           isActive={true}
           linkedContent={connection.linkedContent}
+          type={connection.type} // Pass connection type to ResonanceThread
         />
       ))}
 

@@ -17,9 +17,13 @@ export function CinematicTransition({
   onTransitionComplete,
   children,
 }: CinematicTransitionProps) {
-  const [phase, setPhase] = useState<"idle" | "dolly-out" | "zoom-in" | "immersive">("idle")
+  const [phase, setPhase] = useState<"idle" | "dolly-out" | "zoom-in" | "immersive" | "organic-exit">("idle")
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [edgeProximity, setEdgeProximity] = useState(0)
+  const [exitProgress, setExitProgress] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const selectedTileRef = useRef<HTMLDivElement>(null)
+  const exitTimeoutRef = useRef<NodeJS.Timeout>()
 
   const getFrequencyImage = (frequency: string) => {
     const imageMap = {
@@ -54,6 +58,76 @@ export function CinematicTransition({
     }, 900)
   }, [isActive, selectedTile, onTransitionComplete])
 
+  useEffect(() => {
+    if (phase !== "immersive") return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e
+      const { innerWidth, innerHeight } = window
+
+      setMousePosition({ x: clientX, y: clientY })
+
+      // Calculate distance to nearest edge (0-1, where 0 is at edge)
+      const edgeThreshold = 100 // pixels from edge
+      const distanceToEdge = Math.min(
+        clientX, // left edge
+        clientY, // top edge
+        innerWidth - clientX, // right edge
+        innerHeight - clientY, // bottom edge
+      )
+
+      const proximity = Math.max(0, 1 - distanceToEdge / edgeThreshold)
+      setEdgeProximity(proximity)
+
+      // Start exit sequence when near edge
+      if (proximity > 0.3) {
+        if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current)
+
+        exitTimeoutRef.current = setTimeout(() => {
+          if (proximity > 0.5) {
+            console.log("[v0] Initiating organic exit - mouse at edge")
+            setPhase("organic-exit")
+
+            // Gradual zoom-out animation
+            setTimeout(() => {
+              setPhase("idle")
+              onTransitionComplete()
+            }, 1200)
+          }
+        }, 800) // Delay to prevent accidental exits
+      } else {
+        if (exitTimeoutRef.current) {
+          clearTimeout(exitTimeoutRef.current)
+          exitTimeoutRef.current = undefined
+        }
+      }
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current)
+    }
+  }, [phase, onTransitionComplete])
+
+  useEffect(() => {
+    if (phase === "organic-exit") {
+      let progress = 0
+      const interval = setInterval(() => {
+        progress += 0.05
+        setExitProgress(progress)
+        if (progress >= 1) {
+          clearInterval(interval)
+        }
+      }, 50)
+
+      return () => clearInterval(interval)
+    } else {
+      setExitProgress(0)
+    }
+  }, [phase])
+
   if (phase === "idle") {
     return <>{children}</>
   }
@@ -61,7 +135,7 @@ export function CinematicTransition({
   return (
     <div
       ref={containerRef}
-      className={`perspective-container ${phase === "immersive" ? "fullscreen-overlay" : "relative w-full h-full"}`}
+      className={`perspective-container ${phase === "immersive" || phase === "organic-exit" ? "fullscreen-overlay" : "relative w-full h-full"}`}
     >
       <div className={`absolute inset-0 ${phase === "dolly-out" ? "cinematic-dolly-zoom-out" : ""}`}>{children}</div>
 
@@ -70,7 +144,7 @@ export function CinematicTransition({
           ref={selectedTileRef}
           className={`absolute z-50 ${phase === "zoom-in" ? "cinematic-zoom-in-fullscreen" : ""} ${
             phase === "immersive" ? "immersive-plunge" : ""
-          }`}
+          } ${phase === "organic-exit" ? "organic-zoom-out" : ""}`}
           style={
             {
               left: `${selectedTile.x}%`,
@@ -81,6 +155,7 @@ export function CinematicTransition({
               "--tile-y": `${selectedTile.y}%`,
               "--tile-w": `${selectedTile.width}%`,
               "--tile-h": `${selectedTile.height}%`,
+              "--exit-progress": exitProgress,
             } as React.CSSProperties
           }
         >
@@ -91,8 +166,12 @@ export function CinematicTransition({
               className="w-full h-full object-cover"
             />
 
-            {phase === "immersive" && (
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40">
+            {(phase === "immersive" || phase === "organic-exit") && (
+              <div
+                className={`absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40 ${
+                  phase === "organic-exit" ? "opacity-fade-out" : ""
+                }`}
+              >
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="text-4xl font-bold text-foreground mb-4 reality-shift">
                     {selectedTile.frequency} DIMENSION
@@ -128,15 +207,15 @@ export function CinematicTransition({
                   <div className="mt-6 text-sm font-mono text-accent">{selectedTile.metadata} // ACTIVE</div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    setPhase("idle")
-                    onTransitionComplete()
-                  }}
-                  className="absolute top-8 right-8 text-foreground/60 hover:text-foreground transition-colors duration-200"
-                >
-                  <div className="text-2xl">×</div>
-                </button>
+                {phase === "immersive" && edgeProximity > 0.2 && (
+                  <div
+                    className="absolute top-8 right-8 text-accent/60 text-sm font-mono transition-opacity duration-300"
+                    style={{ opacity: edgeProximity }}
+                  >
+                    EDGE PROXIMITY: {Math.floor(edgeProximity * 100)}%
+                    {edgeProximity > 0.5 && <div className="text-xs mt-1">INITIATING EXIT...</div>}
+                  </div>
+                )}
               </div>
             )}
           </div>

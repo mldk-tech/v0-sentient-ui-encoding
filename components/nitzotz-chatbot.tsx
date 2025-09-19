@@ -10,15 +10,26 @@ interface Message {
   type: "user" | "bot"
   content: string
   timestamp: Date
-  messageType?: "text" | "data" | "video" | "resonance"
+  messageType?: "text" | "data" | "video" | "resonance" | "curatorial"
+}
+
+interface CuratorialData {
+  signalStrength: number
+  culturalRelevance: number
+  narrativeDepth: number
+  sonicQuality: number
+  resonanceScore: number
+  authenticity: number
+  productionStatus: "live" | "curated" | "amplified"
 }
 
 interface NitzotzChatbotProps {
   onResonanceThread?: (query: string) => void
   currentTileContext?: string
+  curatorialData?: CuratorialData
 }
 
-export default function NitzotzChatbot({ onResonanceThread, currentTileContext }: NitzotzChatbotProps) {
+export default function NitzotzChatbot({ onResonanceThread, currentTileContext, curatorialData }: NitzotzChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
@@ -60,7 +71,10 @@ export default function NitzotzChatbot({ onResonanceThread, currentTileContext }
     return "הזרם מחובר. מה תרצה לחקור?"
   }
 
-  const typeMessage = async (content: string, messageType: "text" | "data" | "video" | "resonance" = "text") => {
+  const typeMessage = async (
+    content: string,
+    messageType: "text" | "data" | "video" | "resonance" | "curatorial" = "text",
+  ) => {
     setIsTyping(true)
     const messageId = Date.now().toString()
 
@@ -123,39 +137,89 @@ export default function NitzotzChatbot({ onResonanceThread, currentTileContext }
       }
     }
 
-    // Context-aware responses
-    if (lowerInput.includes("כלכלה") || lowerInput.includes("עסקים")) {
+    // Socratic responses based on key concepts
+    if (lowerInput.includes("שלום") || lowerInput.includes("peace")) {
       return {
-        content: "אתה שואל על כלכלה. בזמן שאנחנו מדברים, נחתמה עסקת ענק ביקנעם. האם זה קשור לשאלה שלך?",
-        type: "resonance" as const,
+        content: "האם שלום הוא היעדר קונפליקט, או ניהול מתמיד שלו? [מציג אריח וידאו של דיון סוער בכנסת]",
+        type: "video" as const,
       }
     }
 
-    if (lowerInput.includes("תרבות") || lowerInput.includes("אמנות")) {
+    if (lowerInput.includes("דמוקרטיה") || lowerInput.includes("democracy")) {
       return {
-        content: "התרבות זורמת כמו תדרים. איזה תדר מושך אותך יותר - הכאוס היצירתי או הסדר המובנה?",
+        content: "דמוקרטיה - האם זה כלל הרוב, או הגנה על המיעוט? מה קורה כשהשניים מתנגשים?",
         type: "text" as const,
       }
     }
 
-    if (lowerInput.includes("טכנולוגיה") || lowerInput.includes("קוד")) {
+    if (lowerInput.includes("זהות") || lowerInput.includes("identity")) {
       return {
-        content:
-          "```\nCODE_FREQUENCY: 972.3MHz\nSTATUS: ACTIVE\nCONNECTIONS: 1,247\n```\nהקוד חי ונושם. מה תרצה לגלות בתוכו?",
-        type: "data" as const,
+        content: "זהות ישראלית - האם היא נבנית מהעבר, או מהעתיד שאנחנו בוחרים? איך אתה מגדיר את עצמך?",
+        type: "text" as const,
       }
     }
 
-    // Default exploratory responses
-    const responses = [
-      "השאלה שלך פותחת שרשור חדש. איזה כיוון מעניין אותך יותר?",
-      "יש כאן משהו מעמיק. בואו נחפור יותר.",
-      "האות מתחזק. ספר לי עוד על מה שמעניין אותך.",
-      "זה מזכיר לי משהו מהתדר השני. רוצה לחקור את הקשר?",
+    if (lowerInput.includes("טכנולוגיה") || lowerInput.includes("קוד") || lowerInput.includes("code")) {
+      if (curatorialData) {
+        return {
+          content: `האות שאתה חוקר (CODE) זוהה על ידי האוצר הראשי כבעל 'עומק נרטיבי' של ${Math.round(curatorialData.narrativeDepth)}%, אך 'הרלוונטיות התרבותית' שלו עדיין ${curatorialData.culturalRelevance < 50 ? "נמוכה" : "גבוהה"}. מדוע לדעתך זה כך?`,
+          type: "curatorial" as const,
+        }
+      }
+      return {
+        content: "הטכנולוגיה משנה אותנו, או שאנחנו משנים אותה? איפה הגבול בין כלי לזהות?",
+        type: "text" as const,
+      }
+    }
+
+    if (lowerInput.includes("תרבות") || lowerInput.includes("אמנות")) {
+      if (curatorialData) {
+        return {
+          content: `מעניין - האותנטיות של האות הזה עומדת על ${Math.round(curatorialData.authenticity)}%. האם אמנות 'אמיתית' חייבת להיות ספונטנית, או שגם יצירה מתוכננת יכולה לגעת בנשמה?`,
+          type: "curatorial" as const,
+        }
+      }
+      return {
+        content: "תרבות - האם היא משקפת מי שאנחנו, או מעצבת מי שנהיה? איך אמנות משנה חברה?",
+        type: "text" as const,
+      }
+    }
+
+    if (lowerInput.includes("כלכלה") || lowerInput.includes("עסקים")) {
+      return {
+        content: "הצלחה כלכלית - האם היא מטרה או אמצעי? מה קורה כשהיא מתנגשת עם ערכים?",
+        type: "text" as const,
+      }
+    }
+
+    // Context-aware curatorial insights
+    if (currentTileContext && curatorialData) {
+      const insights = [
+        `האות מ${currentTileContext} מראה רמת תהודה של ${Math.round(curatorialData.resonanceScore * 10) / 10}Hz. למה לדעתך הוא מהדהד דווקא עכשיו?`,
+        `מעניין - האות הזה (${currentTileContext}) נמצא במצב '${curatorialData.productionStatus}'. איך זה משפיע על האמינות שלו?`,
+        `האיכות הסונית של האות הזה ${curatorialData.sonicQuality > 70 ? "גבוהה" : "נמוכה"}. האם צליל טוב הופך מסר לאמין יותר?`,
+      ]
+
+      if (Math.random() < 0.4) {
+        // 40% chance for curatorial insight
+        return {
+          content: insights[Math.floor(Math.random() * insights.length)],
+          type: "curatorial" as const,
+        }
+      }
+    }
+
+    // Paradoxical Socratic questions
+    const socraticResponses = [
+      "השאלה שלך מעלה פרדוקס - האם החיפוש אחר תשובות חשוב יותר מהתשובות עצמן?",
+      "מעניין. אתה מחפש וודאות בעולם של ספקות. איך זה משפיע על מה שאתה מוצא?",
+      "השאלה הזו מזכירה לי משהו - האם אנחנו שואלים כדי לדעת, או כדי להבין שאנחנו לא יודעים?",
+      "יש כאן משהו עמוק. מה אם התשובה שאתה מחפש כבר קיימת בשאלה עצמה?",
+      "זה מעורר מחשבה - האם המציאות משתנה כשאנחנו צופים בها, או שאנחנו משתנים?",
     ]
 
     return {
-      content: responses[Math.floor(Math.random() * responses.length)],
+      content: socraticResponses[Math.floor(Math.random() * socraticResponses.length)],
       type: "text" as const,
     }
   }
@@ -224,6 +288,16 @@ export default function NitzotzChatbot({ onResonanceThread, currentTileContext }
                     >
                       {message.messageType === "data" ? (
                         <pre className="bg-gray-900 p-2 rounded text-green-400 text-xs">{message.content}</pre>
+                      ) : message.messageType === "curatorial" ? (
+                        <div className="bg-blue-900/20 border border-blue-500/30 p-2 rounded">
+                          <div className="text-blue-400 text-xs mb-1">📊 CURATORIAL INSIGHT</div>
+                          <div>{message.content}</div>
+                        </div>
+                      ) : message.messageType === "video" ? (
+                        <div className="bg-red-900/20 border border-red-500/30 p-2 rounded">
+                          <div className="text-red-400 text-xs mb-1">🎥 VIDEO REFERENCE</div>
+                          <div>{message.content}</div>
+                        </div>
                       ) : message.messageType === "resonance" ? (
                         <div>
                           <div className="mb-2">{message.content}</div>
