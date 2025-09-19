@@ -1,0 +1,408 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0a0f1c;
+  --foreground: #e2e8f0;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --popover: #1e293b;
+  --popover-foreground: #ffffff;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #7c3aed;
+  --secondary-foreground: #ffffff;
+  --muted: #64748b;
+  --muted-foreground: #94a3b8;
+  --accent: #06b6d4;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #1e293b;
+  --ring: rgba(79, 70, 229, 0.4);
+
+  /* Enhanced frequency-specific colors for better visual identity */
+  --chaos-primary: #0ea5e9;
+  --chaos-secondary: #0284c7;
+  --chaos-glow: rgba(14, 165, 233, 0.3);
+
+  --creation-primary: #f59e0b;
+  --creation-secondary: #d97706;
+  --creation-glow: rgba(245, 158, 11, 0.3);
+
+  --soul-primary: #8b5cf6;
+  --soul-secondary: #7c3aed;
+  --soul-glow: rgba(139, 92, 246, 0.3);
+
+  --code-primary: #10b981;
+  --code-secondary: #059669;
+  --code-glow: rgba(16, 185, 129, 0.3);
+
+  /* Enhanced neural effects */
+  --neural-glow: rgba(79, 70, 229, 0.4);
+  --breathing-duration: 6s;
+  --pulse-intensity: 0.9;
+
+  /* Typography enhancements */
+  --font-display: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono-enhanced: "Geist Mono", "SF Mono", Monaco, "Cascadia Code", monospace;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --popover: #1e293b;
+  --popover-foreground: #f1f5f9;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #7c3aed;
+  --secondary-foreground: #ffffff;
+  --muted: #64748b;
+  --muted-foreground: #94a3b8;
+  --accent: #06b6d4;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #475569;
+  --input: #1e293b;
+  --ring: rgba(79, 70, 229, 0.4);
+  --chart-1: #6366f1;
+  --chart-2: #8b5cf6;
+  --chart-3: #d97706;
+  --chart-4: #f1f5f9;
+  --chart-5: #64748b;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #4f46e5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #7c3aed;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #475569;
+  --sidebar-ring: rgba(79, 70, 229, 0.4);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Added custom animations for sentient UI effects */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+@keyframes neural-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--neural-glow);
+  }
+  50% {
+    box-shadow: 0 0 40px var(--neural-glow), 0 0 60px var(--neural-glow);
+  }
+}
+
+@keyframes character-scan {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Enhanced stagger-reveal animation for better visibility */
+@keyframes stagger-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes frequency-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  75% {
+    transform: translateY(10px);
+  }
+}
+
+/* Added neural network background animation */
+@keyframes neural-network {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* Added cinematic transition animations */
+@keyframes cinematic-dolly-zoom-out {
+  from {
+    transform: scale(1) translateZ(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.1) translateZ(-1000px);
+    opacity: 0.1;
+  }
+}
+
+@keyframes cinematic-zoom-in-fullscreen {
+  from {
+    transform: scale(1) translateZ(0);
+    clip-path: polygon(
+      var(--tile-x) var(--tile-y),
+      calc(var(--tile-x) + var(--tile-w)) var(--tile-y),
+      calc(var(--tile-x) + var(--tile-w)) calc(var(--tile-y) + var(--tile-h)),
+      var(--tile-x) calc(var(--tile-y) + var(--tile-h))
+    );
+  }
+  to {
+    transform: scale(10) translateZ(100px);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@keyframes immersive-plunge {
+  0% {
+    transform: scale(1) perspective(1000px) rotateX(0deg);
+    filter: blur(0px);
+  }
+  50% {
+    transform: scale(1.2) perspective(1000px) rotateX(-5deg);
+    filter: blur(2px);
+  }
+  100% {
+    transform: scale(20) perspective(1000px) rotateX(0deg);
+    filter: blur(0px);
+  }
+}
+
+@keyframes reality-shift {
+  0% {
+    transform: scale(1) rotateY(0deg);
+    filter: hue-rotate(0deg) saturate(1);
+  }
+  25% {
+    transform: scale(1.1) rotateY(5deg);
+    filter: hue-rotate(90deg) saturate(1.5);
+  }
+  50% {
+    transform: scale(1.2) rotateY(0deg);
+    filter: hue-rotate(180deg) saturate(2);
+  }
+  75% {
+    transform: scale(1.1) rotateY(-5deg);
+    filter: hue-rotate(270deg) saturate(1.5);
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+    filter: hue-rotate(360deg) saturate(1);
+  }
+}
+
+@keyframes breathe-organic {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.85;
+    filter: brightness(1) saturate(1);
+  }
+  33% {
+    transform: scale(1.01) rotate(0.5deg);
+    opacity: 0.95;
+    filter: brightness(1.05) saturate(1.1);
+  }
+  66% {
+    transform: scale(1.02) rotate(-0.3deg);
+    opacity: 1;
+    filter: brightness(1.1) saturate(1.2);
+  }
+}
+
+.breathing-canvas {
+  animation: breathe-organic var(--breathing-duration) ease-in-out infinite, neural-network 25s ease-in-out infinite;
+  background-image: radial-gradient(circle at 15% 85%, var(--chaos-glow) 0%, transparent 60%),
+    radial-gradient(circle at 85% 15%, var(--creation-glow) 0%, transparent 60%),
+    radial-gradient(circle at 45% 55%, var(--soul-glow) 0%, transparent 60%),
+    radial-gradient(circle at 75% 75%, var(--code-glow) 0%, transparent 60%);
+  background-size: 120% 120%, 120% 120%, 120% 120%, 120% 120%;
+}
+
+.neural-glow {
+  animation: neural-pulse 2s ease-in-out infinite;
+}
+
+/* Added neural-glow-soft class for subtle glow effects */
+.neural-glow-soft {
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.2), 0 0 30px rgba(79, 70, 229, 0.1);
+  animation: neural-pulse 3s ease-in-out infinite;
+}
+
+.character-scan {
+  animation: character-scan 0.4s ease-out forwards;
+}
+
+.stagger-reveal {
+  animation: stagger-reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.frequency-wave {
+  animation: frequency-wave 3s ease-in-out infinite;
+}
+
+/* Added cinematic transition classes */
+.cinematic-dolly-zoom-out {
+  animation: cinematic-dolly-zoom-out 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.cinematic-zoom-in-fullscreen {
+  animation: cinematic-zoom-in-fullscreen 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.immersive-plunge {
+  animation: immersive-plunge 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reality-shift {
+  animation: reality-shift 2s ease-in-out infinite;
+}
+
+/* Added grayscale filter utility */
+.filter.grayscale-20 {
+  filter: grayscale(20%) brightness(0.9);
+}
+
+/* Perspective container for 3D effects */
+.perspective-container {
+  perspective: 1000px;
+  perspective-origin: center center;
+}
+
+/* Fullscreen overlay for immersive mode */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: var(--background);
+  overflow: hidden;
+}
+
+/* Enhanced frequency-specific glow effects */
+.chaos-glow {
+  box-shadow: 0 0 20px var(--chaos-glow), 0 0 40px var(--chaos-glow), inset 0 0 20px rgba(14, 165, 233, 0.1);
+}
+
+.creation-glow {
+  box-shadow: 0 0 20px var(--creation-glow), 0 0 40px var(--creation-glow), inset 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
+.soul-glow {
+  box-shadow: 0 0 20px var(--soul-glow), 0 0 40px var(--soul-glow), inset 0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+.code-glow {
+  box-shadow: 0 0 20px var(--code-glow), 0 0 40px var(--code-glow), inset 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+/* Enhanced typography for curatorial metadata */
+.metadata-stamp {
+  font-family: var(--font-mono-enhanced);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: var(--foreground);
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* Enhanced curatorial overlay styling */
+.curatorial-overlay {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+  backdrop-filter: blur(12px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
